@@ -10,9 +10,11 @@ if ( class_exists( 'simple_html_dom' ) === false ) {
 class TDT_Lazyload {
 
 	private $is_enable;
+	private $lazyload_class;
 
 	function __construct() {
 		$this->is_enable = false;
+		$this->lazyload_class = 'lozad';
 	}
 
 	/**
@@ -176,7 +178,7 @@ class TDT_Lazyload {
 				 * Add lazyload class to image
 				 * Upcoming feature: Add custom class to image before/after lazyload
 				 */
-				$image->class = 'lozad ' . $image->class;
+				$image->class = $this->lazyload_class . ' ' . $image->class;
 
 				/**
 				 * Destroy below attribute
@@ -208,7 +210,7 @@ class TDT_Lazyload {
 				 * Add lazyload class to iframe
 				 * Upcoming feature: Add custom class to iframe before/after lazyload
 				 */
-				$iframe->class = 'lozad ' . $iframe->class;
+				$iframe->class = $this->lazyload_class . ' ' . $iframe->class;
 
 				/**
 				 * Destroy below attribute
