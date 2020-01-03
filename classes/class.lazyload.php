@@ -252,17 +252,16 @@ class TDT_Lazyload {
 	public function load_scripts() {
 		wp_enqueue_script(
 			'tdt-lazyload',
-			TDT_LAZYLOAD_PLUGIN_DIR . 'assets/js/lozad.min.js',
+			TDT_LAZYLOAD_PLUGIN_DIR . 'assets/js/lozad.custom.min.js',
 			'',
 			null,
 			false
 		);
-		wp_add_inline_script('tdt-lazyload','window.onload=function(){lozad().observe()}');
 	}
 
 	public function async_script( $url ) {
-		if ( strpos( $url, 'lozad.min.js' ) ) {
-			return str_replace( 'lozad.min.js', "lozad.min.js' async='async", $url );
+		if ( strpos( $url, 'lozad.custom.min.js' ) ) {
+			return str_replace( 'lozad.custom.min.js', "lozad.custom.min.js' async='async", $url );
 		}
 		return $url;
 	}
