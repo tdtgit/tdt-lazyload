@@ -252,7 +252,7 @@ class TDT_Lazyload {
 	public function load_scripts() {
 		wp_enqueue_script(
 			'tdt-lazyload',
-			TDT_LAZYLOAD_PLUGIN_DIR . 'assets/js/lozad.custom.js',
+			TDT_LAZYLOAD_PLUGIN_DIR . 'assets/js/lozad.custom.min.js',
 			'',
 			null,
 			false
