@@ -10,9 +10,11 @@ if ( class_exists( 'simple_html_dom' ) === false ) {
 class TDT_Lazyload {
 
 	private $is_enable;
+	private $lazyload_class;
 
 	function __construct() {
 		$this->is_enable = false;
+		$this->lazyload_class = 'lozad';
 	}
 
 	/**
@@ -55,7 +57,6 @@ class TDT_Lazyload {
 			 * Yeah, load styles/scripts in first order, before jQuery because we don't it anyway
 			 */
 			add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ), 0 );
-			add_action( 'wp_footer', array( $this, 'replace_nojs_body' ), 1 );
 			add_filter( 'clean_url', array( $this, 'async_script' ) );
 		}
 	}
@@ -174,15 +175,10 @@ class TDT_Lazyload {
 				}
 
 				/**
-				 * Fallback if users not Javascript-enabled. Image without lazyload-effect will be display instead.
-				 */
-				// $nojs = '<noscript>' . $image . '</noscript>';
-
-				/**
 				 * Add lazyload class to image
 				 * Upcoming feature: Add custom class to image before/after lazyload
 				 */
-				$image->class = 'lozad ' . $image->class;
+				$image->class = $this->lazyload_class . ' ' . $image->class;
 
 				/**
 				 * Destroy below attribute
@@ -214,7 +210,7 @@ class TDT_Lazyload {
 				 * Add lazyload class to iframe
 				 * Upcoming feature: Add custom class to iframe before/after lazyload
 				 */
-				$iframe->class = 'lozad ' . $iframe->class;
+				$iframe->class = $this->lazyload_class . ' ' . $iframe->class;
 
 				/**
 				 * Destroy below attribute
@@ -261,14 +257,7 @@ class TDT_Lazyload {
 			null,
 			false
 		);
-	}
-
-	/**
-	 * If users have enale javascript, browser will replace `no-js` class added from fallback_body_class() to `js`
-	 * That make lazyload effect work.
-	 */
-	public function replace_nojs_body() {
-		echo '<script>window.onload=function(){lozad().observe()}</script>';
+		wp_add_inline_script('tdt-lazyload','window.onload=function(){lozad().observe()}');
 	}
 
 	public function async_script( $url ) {
