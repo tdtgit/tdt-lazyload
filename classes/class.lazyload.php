@@ -56,7 +56,7 @@ class TDT_Lazyload {
 			/**
 			 * Yeah, load styles/scripts in first order, before jQuery because we don't it anyway
 			 */
-			add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ), 0 );
+			add_action( 'wp_footer', array( $this, 'load_scripts' ), 0 );
 			add_filter( 'clean_url', array( $this, 'async_script' ) );
 		}
 	}
