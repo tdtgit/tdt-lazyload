@@ -260,8 +260,8 @@ class TDT_Lazyload {
 	}
 
 	public function async_script( $url ) {
-		if ( strpos( $url, 'lozad.custom.js' ) ) {
-			return str_replace( 'lozad.custom.js', "lozad.custom.js' async='async", $url );
+		if ( strpos( $url, 'lozad.custom.min.js' ) ) {
+			return str_replace( 'lozad.custom.min.js', "lozad.custom.min.js' async='async", $url );
 		}
 		return $url;
 	}
