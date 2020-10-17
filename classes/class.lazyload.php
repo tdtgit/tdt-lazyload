@@ -166,88 +166,57 @@ class TDT_Lazyload{
 	public function replace($html){
 		$doc = new Document($html);
 
+		$excludeClass           = [];
+		$excludeClass['img']    = $this->get_exclude_class('tdt_lazyload_exclude_image_with_class');
+		$excludeClass['iframe'] = $this->get_exclude_class('tdt_lazyload_exclude_iframe_with_class');
+		$excludeClass['video']  = $this->get_exclude_class('tdt_lazyload_exclude_video_with_class');
+
+		$findElementName = [];
 		if (isset(get_option('tdt_lazyload_enable_for_advanced')['image']) && get_option('tdt_lazyload_enable_for_advanced')['image']){
-			$excludeImageClass = $this->get_exclude_class('tdt_lazyload_exclude_image_with_class');
-
-			$image_array = $doc->find('img');
-			foreach ($image_array as $image){
-				foreach ($excludeImageClass as $class){
-					if ($image->classes()->contains($class)){
-						continue;
-					}
-				}
-
-				/**
-				 * Fallback if users not Javascript-enabled. Image without lazyload-effect will be display instead.
-				 */
-				$no_js_element = new Element('noscript', $image->outerHtml());
-				$image->appendChild($no_js_element);
-
-				$image->setAttribute('data-src', $image->getAttribute('src'));
-
-				if ($image->hasAttribute('sizes')){
-					$image->setAttribute('data-sizes', $image->getAttribute('sizes'));
-				}
-
-				if ($image->hasAttribute('srcset')){
-					$image->setAttribute('data-srcset', $image->getAttribute('srcset'));
-				}
-
-				$image->classes()->add($this->lazyload_class);
-
-				$image->removeAttribute('src');
-				$image->removeAttribute('sizes');
-				$image->removeAttribute('srcset');
-			}
+			array_push($findElementName, 'img');
 		}
-
 		if (isset(get_option('tdt_lazyload_enable_for_advanced')['iframe']) && get_option('tdt_lazyload_enable_for_advanced')['iframe']){
-			$excludeIframeClass = $this->get_exclude_class('tdt_lazyload_exclude_iframe_with_class');
-
-			foreach ($doc->find('iframe') as $iframe){
-				foreach ($excludeIframeClass as $class){
-					if ($iframe->classes()->contains($class)){
-						continue;
-					}
-				}
-
-				/**
-				 * Fallback if users not Javascript-enabled. Iframe without lazyload-effect will be display instead.
-				 */
-				$no_js_element = new Element('noscript', $iframe->outerHtml());
-				$iframe->appendChild($no_js_element);
-
-				$iframe->setAttribute('data-src', $iframe->getAttribute('src'));
-
-				$iframe->classes()->add($this->lazyload_class);
-
-				$iframe->removeAttribute('src');
-			}
+			array_push($findElementName, 'iframe');
 		}
-
 		if (isset(get_option('tdt_lazyload_enable_for_advanced')['video']) && get_option('tdt_lazyload_enable_for_advanced')['video']){
-			$excludeVideoClass = $this->get_exclude_class('tdt_lazyload_exclude_video_with_class');
-
-			foreach ($doc->find('video') as $video){
-				foreach ($excludeVideoClass as $class){
-					if ($video->classes()->contains($class)){
-						continue;
-					}
-				}
-
-				/**
-				 * Fallback if users not Javascript-enabled. Iframe without lazyload-effect will be display instead.
-				 */
-				$no_js_element = new Element('noscript', $video->outerHtml());
-				$video->appendChild($no_js_element);
-
-				$video->setAttribute('data-src', $video->getAttribute('src'));
-
-				$video->classes()->add($this->lazyload_class);
-
-				$video->removeAttribute('src');
-			}
+			array_push($findElementName, 'video');
 		}
+
+		$element_array = $doc->find(implode(',', $findElementName));
+		foreach ($element_array as $element){
+
+			foreach ($excludeClass[$element->tagName] as $class){
+				if (strpos(implode('', $element->classes()->getAll()), $class) ||
+				    strpos(implode('', $element->parent()->classes()->getAll()), $class)){
+					continue;
+				}
+			}
+
+			/**
+			 * Fallback if users not Javascript-enabled. Image without lazyload-effect will be display instead.
+			 */
+			$no_js_element = new Element('noscript', $element->outerHtml());
+			$element->appendChild($no_js_element);
+
+			if ($element->hasAttribute('src')){
+				$element->setAttribute('data-src', $element->getAttribute('src'));
+			}
+
+			if ($element->hasAttribute('sizes')){
+				$element->setAttribute('data-sizes', $element->getAttribute('sizes'));
+			}
+
+			if ($element->hasAttribute('srcset')){
+				$element->setAttribute('data-srcset', $element->getAttribute('srcset'));
+			}
+
+			$element->classes()->add($this->lazyload_class);
+
+			$element->removeAttribute('src');
+			$element->removeAttribute('sizes');
+			$element->removeAttribute('srcset');
+		}
+
 
 		return $doc->html();
 	}
