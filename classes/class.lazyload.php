@@ -171,8 +171,10 @@ class TDT_Lazyload{
 
 			$image_array = $doc->find('img');
 			foreach ($image_array as $image){
-				if ($image->classes()->contains($excludeImageClass)){
-					continue;
+				foreach ($excludeImageClass as $class){
+					if ($image->classes()->contains($class)){
+						continue;
+					}
 				}
 
 				/**
@@ -203,8 +205,10 @@ class TDT_Lazyload{
 			$excludeIframeClass = $this->get_exclude_class('tdt_lazyload_exclude_iframe_with_class');
 
 			foreach ($doc->find('iframe') as $iframe){
-				if ($iframe->classes()->contains($excludeIframeClass)){
-					continue;
+				foreach ($excludeIframeClass as $class){
+					if ($iframe->classes()->contains($class)){
+						continue;
+					}
 				}
 
 				/**
@@ -222,24 +226,26 @@ class TDT_Lazyload{
 		}
 
 		if (isset(get_option('tdt_lazyload_enable_for_advanced')['video']) && get_option('tdt_lazyload_enable_for_advanced')['video']){
-			$excludeIframeClass = $this->get_exclude_class('tdt_lazyload_exclude_video_with_class');
+			$excludeVideoClass = $this->get_exclude_class('tdt_lazyload_exclude_video_with_class');
 
-			foreach ($doc->find('video') as $iframe){
-				if ($iframe->classes()->contains($excludeIframeClass)){
-					continue;
+			foreach ($doc->find('video') as $video){
+				foreach ($excludeVideoClass as $class){
+					if ($video->classes()->contains($class)){
+						continue;
+					}
 				}
 
 				/**
 				 * Fallback if users not Javascript-enabled. Iframe without lazyload-effect will be display instead.
 				 */
-				$no_js_element = new Element('noscript', $iframe->outerHtml());
-				$iframe->appendChild($no_js_element);
+				$no_js_element = new Element('noscript', $video->outerHtml());
+				$video->appendChild($no_js_element);
 
-				$iframe->setAttribute('data-src', $iframe->getAttribute('src'));
+				$video->setAttribute('data-src', $video->getAttribute('src'));
 
-				$iframe->classes()->add($this->lazyload_class);
+				$video->classes()->add($this->lazyload_class);
 
-				$iframe->removeAttribute('src');
+				$video->removeAttribute('src');
 			}
 		}
 
@@ -252,10 +258,10 @@ class TDT_Lazyload{
 	 *
 	 * @param $option_name
 	 *
-	 * @return array|false|string[]
+	 * @return array
 	 */
 	function get_exclude_class($option_name){
-		$exClass = get_option($option_name);
+		$exClass = get_option($option_name, 'nolazyload,');
 		$exClass = str_replace(' ', '', $exClass);
 
 		return preg_split('/,/', $exClass, - 1, PREG_SPLIT_NO_EMPTY);
