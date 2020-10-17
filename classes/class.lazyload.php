@@ -221,6 +221,28 @@ class TDT_Lazyload{
 			}
 		}
 
+		if (isset(get_option('tdt_lazyload_enable_for_advanced')['video']) && get_option('tdt_lazyload_enable_for_advanced')['video']){
+			$excludeIframeClass = $this->get_exclude_class('tdt_lazyload_exclude_video_with_class');
+
+			foreach ($doc->find('video') as $iframe){
+				if ($iframe->classes()->contains($excludeIframeClass)){
+					continue;
+				}
+
+				/**
+				 * Fallback if users not Javascript-enabled. Iframe without lazyload-effect will be display instead.
+				 */
+				$no_js_element = new Element('noscript', $iframe->outerHtml());
+				$iframe->appendChild($no_js_element);
+
+				$iframe->setAttribute('data-src', $iframe->getAttribute('src'));
+
+				$iframe->classes()->add($this->lazyload_class);
+
+				$iframe->removeAttribute('src');
+			}
+		}
+
 		return $doc->html();
 	}
 
