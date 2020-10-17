@@ -11,10 +11,12 @@ class TDT_Lazyload{
 
 	private $is_enabled;
 	private $lazyload_class;
+	private $lazyload_js_inline;
 
 	function __construct(){
-		$this->is_enabled     = FALSE;
-		$this->lazyload_class = 'lozad';
+		$this->is_enabled         = FALSE;
+		$this->lazyload_class     = 'lozad';
+		$this->lazyload_js_inline = 'if("loading"in HTMLImageElement.prototype)document.querySelectorAll("[loading=lazy]").forEach(function(a){a.dataset.src&&(a.src=a.dataset.src);a.dataset.srcset&&(a.srcset=a.dataset.srcset)});else{var script=document.createElement("script");script.src="/wp-content/plugins/tdt-lazyload/assets/js/lozad.custom.min.js";document.head.appendChild(script)};';
 	}
 
 	/**
@@ -56,8 +58,7 @@ class TDT_Lazyload{
 			/**
 			 * Yeah, load styles/scripts in first order, before jQuery because we don't it anyway
 			 */
-			add_action('wp_footer', [$this, 'load_scripts'], 0);
-			add_filter('clean_url', [$this, 'async_script']);
+			add_action('wp_footer', [$this, 'inline_js_loading']);
 		}
 	}
 
@@ -192,6 +193,10 @@ class TDT_Lazyload{
 				}
 			}
 
+			if ($element->hasAttribute('loading') == FALSE){
+				$element->setAttribute('loading', 'lazy');
+			}
+
 			/**
 			 * Fallback if users not Javascript-enabled. Image without lazyload-effect will be display instead.
 			 */
@@ -216,7 +221,6 @@ class TDT_Lazyload{
 			$element->removeAttribute('sizes');
 			$element->removeAttribute('srcset');
 		}
-
 
 		return $doc->html();
 	}
@@ -255,6 +259,13 @@ class TDT_Lazyload{
 		}
 
 		return $url;
+	}
+
+	public function inline_js_loading(){
+		wp_register_script('tdt-lazyload-dummy', '');
+		wp_enqueue_script('tdt-lazyload-dummy');
+		wp_add_inline_script('tdt-lazyload-dummy',
+			'<script>' . $this->lazyload_js_inline . '</script>');
 	}
 }
 
