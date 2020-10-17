@@ -25,5 +25,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'TDT_LAZYLOAD_PLUGIN_PATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'TDT_LAZYLOAD_PLUGIN_DIR', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 
+require TDT_LAZYLOAD_PLUGIN_PATH . 'vendor/autoload.php';
 require TDT_LAZYLOAD_PLUGIN_PATH . 'classes/class.lazyload.php';
 require TDT_LAZYLOAD_PLUGIN_PATH . 'classes/class.lazyload.admin.php';
